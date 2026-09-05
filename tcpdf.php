@@ -3950,13 +3950,15 @@ class TCPDF
         // (and through the following columns/pages inside the engine call).
         $incolumns = $this->inColumnMode();
         $region = $eng->page->getRegion();
-        $originx = $incolumns ? $region['RX'] : $this->lmargin;
+        $flowx = $incolumns ? $region['RX'] : $this->lmargin;
         $width = $incolumns ? $region['RW'] : $this->getPageWidth() - $this->rmargin - $this->lmargin;
         // Legacy wraps the lines inside the horizontal cell padding and
         // starts them at the padded edge.
-        $originx += $this->cellpadding['L'];
+        $originx = $flowx + $this->cellpadding['L'];
         $width = max(0.0, $width - $this->cellpadding['L'] - $this->cellpadding['R']);
-        $offset = max(0.0, $this->posx - $originx);
+        // The cursor carries the padding too, so it is measured from the
+        // unpadded flow origin.
+        $offset = max(0.0, $this->posx - $flowx);
 
         $styles = ['all' => ['lineWidth' => 0.0]];
         if ((bool) $_fill) {
